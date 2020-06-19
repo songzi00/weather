@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}地区数据{% endblock %}
+{% block content %}
+    {% if message %}
+        <div class="alert alert-danger message" role="alert">{{ message }}
+            <a href="{% url '[myapp]:index' %}" class="alert-link">返回主页&rarr;</a>
+        </div>
+    {% else %}
+        <div class="char_div">
+        {#   循环的获取每个省的数据     #}
+        {% for city in city_info %}
+            <div id="con{{ forloop.counter }}" class="charts" style="width:100%; height:500px;"></div>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+            <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=xfhhaTThl11qYVrqLZii6w8qE5ggnhrY&__ec_v__=20190126"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+
+            <script type="text/javascript">
+                var dom = document.getElementById("con{{ forloop.counter }}");
+                var myChart = echarts.init(dom);
+                var app = {};
+                option = null;
+                option = {
+                    title: {
+                        text: '{{ city.pro.province }}{{ search_date }}气温变化',
+                        subtext: '数据来源中国天气网'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['最高气温', '最低气温']
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            dataView: {readOnly: false},
+                            magicType: {type: ['line', 'bar']},
+                            restore: {},
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: {{ city.city_list|safe }} {# 设置城市 #}
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLabel: {
+                            formatter: '{value} °C'
+                        }
+                    },
+                    series: [
+                        {
+                            name: '最高气温',
+                            type: 'line',
+                            data:  {{ city.max_tp|safe }},
+                            markPoint: {
+                                data: [
+                                    {type: 'max', name: '最大值'},
+                                    {type: 'min', name: '最小值'}
+                                ]
+                            },
+                            markLine: {
+                                data: [
+                                    {type: 'average', name: '平均值'}
+                                ]
+                            }
+                        },
+                        {
+                            name: '最低气温',
+                            type: 'line',
+                            data:  {{ city.min_tp|safe }},
+                            markPoint: {
+                                data: [
+                                    {name: '周最低', value: -2, xAxis: 1, yAxis: -1.5}
+                                ]
+                            },
+                            markLine: {
+                                data: [
+                                    {type: 'average', name: '平均值'},
+                                    [{
+                                        symbol: 'none',
+                                        x: '90%',
+                                        yAxis: 'max'
+                                    }, {
+                                        symbol: 'circle',
+                                        label: {
+                                            position: 'start',
+                                            formatter: '最大值'
+                                        },
+                                        type: 'max',
+                                        name: '最高点'
+                                    }]
+                                ]
+                            }
+                        }
+                    ]
+                };
+                ;
+                if (option && typeof option === "object") {
+                    myChart.setOption(option, true);
+                }
+                </script>
+
+        {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

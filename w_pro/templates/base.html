@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}base{% endblock %}| 天气网</title>
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% block head %}{% endblock %}
+</head>
+<body >
+    <header>
+
+        {% if request.session.is_login %}
+            <span>当前在线:{{ request.session.user_name }}</span>
+            <a href="{% url '[myapp]:logout' %}"><span>登出</span></a>
+        {% else %}
+            <a href="{% url '[myapp]:login' %}">登陆</a>
+            <a href="{% url '[myapp]:register' %}">注册</a>
+        {% endif %}
+
+    </header>
+    <div class="container">
+        <div class="con_title">
+            <h1><a href="{% url '[myapp]:index' %}">中国天气网数据可视化查询</a></h1>
+        </div>
+        {% block content %}
+
+        {% endblock %}
+    </div>
+    <footer>
+
+    </footer>
+</body>
+</html>
